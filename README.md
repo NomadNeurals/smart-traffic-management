@@ -7,3 +7,5 @@ A simple traffic signal management system that assigns green light timings based
 - Shows priority order
 - Future scope: IoT integration, AI-based traffic prediction
 
+## Demo
+👉 [Live Project](https://your-username.github.io/smart-traffic-management/)

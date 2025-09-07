@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Traffic Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1e1e2f;
+      color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #2e2e40;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #4caf50;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      padding: 20px;
+      gap: 20px;
+    }
+    .panel {
+      background: #2e2e40;
+      padding: 20px;
+      border-radius: 10px;
+      flex: 1;
+    }
+    .intersection {
+      flex: 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .road {
+      width: 200px;
+      height: 200px;
+      background: #3a3a50;
+      position: relative;
+      border-radius: 10px;
+    }
+    .light {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      position: absolute;
+    }
+    .north { top: 10px; left: 50%; transform: translateX(-50%); }
+    .south { bottom: 10px; left: 50%; transform: translateX(-50%); }
+    .east { right: 10px; top: 50%; transform: translateY(-50%); }
+    .west { left: 10px; top: 50%; transform: translateY(-50%); }
+    .red { background: red; }
+    .green { background: green; }
+    .yellow { background: yellow; }
+    footer {
+      background: #2e2e40;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    input {
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      width: 100%;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>🚦 Smart Traffic Management System 🚦</header>
+  <main>
+    <!-- Input Panel -->
+    <div class="panel">
+      <h3>Enter Vehicle Counts</h3>
+      <label>North:</label>
+      <input type="number" id="north" value="45">
+      <label>South:</label>
+      <input type="number" id="south" value="12">
+      <label>East:</label>
+      <input type="number" id="east" value="30">
+      <label>West:</label>
+      <input type="number" id="west" value="8">
+      <button onclick="calculateTimings()">Calculate Timings</button>
+    </div>
+
+    <!-- Intersection Visual -->
+    <div class="intersection">
+      <div class="road">
+        <div id="light-north" class="light north red"></div>
+        <div id="light-south" class="light south red"></div>
+        <div id="light-east" class="light east red"></div>
+        <div id="light-west" class="light west red"></div>
+      </div>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="panel">
+      <h3>Signal Timings</h3>
+      <ul id="results"></ul>
+      <h4>Priority Order</h4>
+      <ol id="priority"></ol>
+    </div>
+  </main>
+  <footer>Future Scope: AI + IoT Integration Coming Soon</footer>
+
+  <script>
+    function calculateTimings() {
+      let roads = ["North", "South", "East", "West"];
+      let counts = [
+        parseInt(document.getElementById("north").value) || 0,
+        parseInt(document.getElementById("south").value) || 0,
+        parseInt(document.getElementById("east").value) || 0,
+        parseInt(document.getElementById("west").value) || 0
+      ];
+
+      let slots = [40, 30, 20, 10];
+      let times = [0, 0, 0, 0];
+      let order = [];
+      let used = [false, false, false, false];
+
+      for (let s = 0; s < 4; s++) {
+        let bestIdx = -1, bestVal = -1;
+        for (let i = 0; i < 4; i++) {
+          if (!used[i] && counts[i] > bestVal) {
+            bestVal = counts[i];
+            bestIdx = i;
+          }
+        }
+        used[bestIdx] = true;
+        order.push(bestIdx);
+        times[bestIdx] = slots[s];
+      }
+
+      // Update Results Panel
+      let resultsList = document.getElementById("results");
+      resultsList.innerHTML = "";
+      for (let i = 0; i < 4; i++) {
+        resultsList.innerHTML += `<li>${roads[i]} → ${times[i]}s Green (${counts[i]} vehicles)</li>`;
+      }
+
+      // Update Priority Order
+      let priorityList = document.getElementById("priority");
+      priorityList.innerHTML = "";
+      for (let s = 0; s < 4; s++) {
+        let idx = order[s];
+        priorityList.innerHTML += `<li>${roads[idx]} (${counts[idx]} vehicles) → ${slots[s]}s</li>`;
+      }
+
+      // Reset all lights to red
+      document.getElementById("light-north").className = "light north red";
+      document.getElementById("light-south").className = "light south red";
+      document.getElementById("light-east").className = "light east red";
+      document.getElementById("light-west").className = "light west red";
+
+      // First priority road gets green
+      let first = order[0];
+      if (first === 0) document.getElementById("light-north").className = "light north green";
+      if (first === 1) document.getElementById("light-south").className = "light south green";
+      if (first === 2) document.getElementById("light-east").className = "light east green";
+      if (first === 3) document.getElementById("light-west").className = "light west green";
+    }
+  </script>
+</body>
+</html>
